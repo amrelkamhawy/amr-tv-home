@@ -106,10 +106,8 @@
   </div></div>
 
   <footer>
-    <span><span class="dot" style="background:#e53935"></span>إضافة / شيل من المفضلة</span>
-    <span><span class="dot" style="background:#43a047"></span>نقل للشمال</span>
-    <span><span class="dot" style="background:#fdd835"></span>نقل لليمين</span>
-    <span>OK فتح · Back خروج</span>
+    <span>اضغط OK مطوّل: إضافة / شيل من المفضلة</span>
+        <span>OK فتح · Back خروج</span>
   </footer>
 </div>
 <div id="toast"></div>
@@ -266,7 +264,7 @@
     fav.innerHTML = ''; all.innerHTML = '';
     var shown = 0;
     for (var i = 0; i < favs.length; i++) { var it = byKey(favs[i]); if (it) { fav.appendChild(makeTile(it, true)); shown++; } }
-    if (!shown) { var e = document.createElement('div'); e.id = 'empty'; e.textContent = 'دوس الزرار الأحمر على أي تطبيق تحت عشان تضيفه هنا'; fav.appendChild(e); }
+    if (!shown) { var e = document.createElement('div'); e.id = 'empty'; e.textContent = 'اضغط OK مطوّل على أي تطبيق تحت عشان تضيفه هنا'; fav.appendChild(e); }
     var sorted = apps.slice().sort(function (a, b) { return a.name.localeCompare(b.name); });
     for (var j = 0; j < sorted.length; j++) all.appendChild(makeTile(sorted[j], false));
     var target = null;
@@ -332,7 +330,11 @@
       case 39: move('right'); break;
       case 38: move('up'); break;
       case 40: move('down'); break;
-      case 13: if (cur) { var it = byKey(cur.getAttribute('data-key')); if (it) launch(it); } break;
+      case 13:
+        if (e.repeat || okTimer) break;
+        okLong = false;
+        okTimer = setTimeout(function () { okLong = true; toggleFav(); }, 700);
+        break;
       case 403: toggleFav(); break;           // Red
       case 404: shiftFav(+1); break;          // Green  (RTL: next = to the left)
       case 405: shiftFav(-1); break;          // Yellow
@@ -342,6 +344,15 @@
       default: return;
     }
     e.preventDefault();
+  });
+
+  /* OK: short press = open, long press (0.7s) = add/remove favourite */
+  var okTimer = null, okLong = false;
+  document.addEventListener('keyup', function (e) {
+    if (e.keyCode !== 13) return;
+    if (okTimer) { clearTimeout(okTimer); okTimer = null; }
+    if (!okLong && cur) { var it = byKey(cur.getAttribute('data-key')); if (it) launch(it); }
+    okLong = false;
   });
 
   /* ---------- boot ---------- */
