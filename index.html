@@ -1,108 +1,81 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=1920, height=1080">
 <title>Home</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --text: #f4f6fa;
-    --muted: rgba(235,240,250,0.68);
-    --accent: #f2c36b;
-    --glass: rgba(14,18,28,0.42);
-    --line: rgba(255,255,255,0.12);
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body {
-    width: 1920px; height: 1080px; overflow: hidden; background: #0a0d14; color: var(--text);
-    font-family: "Tajawal", "SamsungOne", Tahoma, Arial, sans-serif; cursor: none;
-  }
-  #wall { position: fixed; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.5s; }
-  #wall.on { opacity: 1; }
-  #shade { position: fixed; inset: 0;
-    background: linear-gradient(180deg, rgba(6,9,15,0.55) 0%, rgba(6,9,15,0.35) 30%, rgba(6,9,15,0.82) 62%, rgba(6,9,15,0.95) 100%); }
-  #stage { position: relative; z-index: 1; height: 1080px; padding: 46px 90px 26px; display: flex; flex-direction: column; }
+  :root { --text:#f5f7fb; --muted:rgba(240,244,252,.72); --accent:#f2c36b; --glass:rgba(10,14,22,.46); --line:rgba(255,255,255,.14); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { width:1920px; height:1080px; overflow:hidden; background:#0a0d14; color:var(--text);
+    font-family:"Outfit","SamsungOne",Arial,sans-serif; cursor:none; }
+  #wall { position:fixed; inset:0; background-size:cover; background-position:center top; opacity:0; transition:opacity 1.2s; filter:brightness(.82); }
+  #wall.on { opacity:1; }
+  #shade { position:fixed; inset:0;
+    background:
+      linear-gradient(90deg, rgba(5,8,14,.86) 0%, rgba(5,8,14,.62) 26%, rgba(5,8,14,0) 46%),
+      linear-gradient(180deg, rgba(5,8,14,0) 46%, rgba(5,8,14,.78) 66%, rgba(5,8,14,.96) 100%); }
+  #stage { position:relative; z-index:1; height:1080px; padding:44px 80px 22px; display:flex; flex-direction:column; }
 
-  header { display: flex; justify-content: space-between; align-items: flex-start; }
-  #time { font-size: 120px; font-weight: 300; line-height: 1; direction: ltr; text-align: right; letter-spacing: -1px; }
-  #date { font-size: 34px; color: var(--muted); margin-top: 6px; }
-  #greet { font-size: 34px; color: var(--accent); margin-top: 4px; font-weight: 500; }
-  .weather { text-align: left; }
-  #wtemp { font-size: 76px; font-weight: 300; line-height: 1; direction: ltr; }
-  #wdesc { font-size: 30px; color: var(--muted); margin-top: 6px; }
+  #top { display:flex; flex-direction:column; width:520px; }
+  #time { font-size:128px; font-weight:300; line-height:1; letter-spacing:-2px; }
+  #date { font-size:32px; color:var(--muted); margin-top:6px; }
+  #hijri { font-size:24px; color:var(--muted); margin-top:2px; }
+  #greet { font-size:32px; color:var(--accent); margin-top:8px; font-weight:500; }
+  #weather { font-size:28px; margin-top:8px; color:var(--text); }
+  #prayers { margin-top:18px; background:var(--glass); border:1px solid var(--line); border-radius:20px; padding:8px 18px; width:430px; }
+  .pr { display:flex; justify-content:space-between; font-size:26px; padding:5px 4px; color:var(--muted); }
+  .pr .t { color:var(--text); font-weight:500; }
+  .pr.next { color:var(--accent); }
+  .pr.next .t { color:var(--accent); }
+  .pr .left { font-size:20px; margin-left:10px; opacity:.9; }
 
-  /* prayer strip */
-  #prayers { display: flex; gap: 14px; margin: 26px 0 26px; }
-  .pr { flex: 1; background: var(--glass); border: 1px solid var(--line); border-radius: 18px; padding: 12px 10px; text-align: center; }
-  .pr .n { font-size: 26px; color: var(--muted); }
-  .pr .t { font-size: 36px; font-weight: 500; direction: ltr; margin-top: 2px; }
-  .pr.next { background: rgba(242,195,107,0.18); border-color: var(--accent); }
-  .pr.next .n { color: var(--accent); }
-  .pr .left { font-size: 22px; color: var(--accent); margin-top: 2px; direction: rtl; }
+  #rows { flex:1; overflow:hidden; position:relative; margin:0 -40px; padding:22px 40px 0; }
+  #scroller { transition:transform .25s ease-out; }
+  .row { margin-bottom:26px; }
+  .row h2 { font-size:26px; font-weight:500; color:var(--muted); margin:0 4px 14px; letter-spacing:.5px; }
+  .tiles { display:flex; flex-wrap:wrap; gap:22px; }
+  .tile { position:relative; border-radius:20px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    transition:transform .15s ease-out, box-shadow .15s ease-out; box-shadow:0 10px 30px rgba(0,0,0,.4); }
+  .fav .tile { width:270px; height:160px; }
+  .all .tile { width:196px; height:118px; }
+  .tile.hasicon { background:#fff !important; }
+  .tile img { width:100%; height:100%; object-fit:cover; }
+  .tile .letter { font-size:56px; font-weight:600; color:#fff; margin-bottom:22px; font-family:Arial,sans-serif; }
+  .all .tile .letter { font-size:42px; margin-bottom:18px; }
+  .tile .name { position:absolute; bottom:9px; left:10px; right:10px; text-align:center; font-size:21px; font-weight:500;
+    color:rgba(255,255,255,.95); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tile.hasicon .name { display:none; }
+  .tile .star { position:absolute; top:8px; right:10px; font-size:20px; color:var(--accent); text-shadow:0 1px 3px rgba(0,0,0,.6); }
+  .tile.focused { transform:scale(1.09); box-shadow:0 0 0 5px #fff, 0 20px 50px rgba(0,0,0,.6); z-index:2; }
+  #label { position:absolute; font-size:22px; font-weight:500; color:#fff; text-shadow:0 2px 6px rgba(0,0,0,.8); pointer-events:none; white-space:nowrap; display:none; z-index:3; }
 
-  #rows { flex: 1; overflow: hidden; position: relative; margin: 0 -40px; padding: 18px 40px 0; }
-  #scroller { transition: transform .25s ease-out; }
-  .row { margin-bottom: 30px; }
-  .row h2 { font-size: 30px; font-weight: 500; color: var(--muted); margin: 0 4px 16px; }
-  .tiles { display: flex; flex-wrap: wrap; gap: 24px; }
-  .tile {
-    position: relative; border-radius: 22px; overflow: hidden;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    transition: transform .15s ease-out, box-shadow .15s ease-out;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-  }
-  .fav .tile { width: 266px; height: 168px; }
-  .all .tile { width: 202px; height: 124px; }
-  .tile img { max-width: 56%; max-height: 58%; object-fit: contain; margin-bottom: 18px; }
-  .tile .letter { font-size: 58px; font-weight: 700; color: #fff; direction: ltr; margin-bottom: 20px; font-family: Arial, sans-serif; }
-  .all .tile .letter { font-size: 44px; }
-  .tile .name {
-    position: absolute; bottom: 10px; left: 10px; right: 10px; text-align: center;
-    font-size: 22px; font-weight: 500; color: rgba(255,255,255,0.92);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .tile .star { position: absolute; top: 10px; left: 12px; font-size: 22px; color: var(--accent); }
-  .tile.focused { transform: scale(1.09); box-shadow: 0 0 0 5px #fff, 0 20px 50px rgba(0,0,0,0.6); z-index: 2; }
-
-  footer { display: flex; justify-content: space-between; font-size: 22px; color: var(--muted); padding-top: 8px; }
-  #diag { font-size: 16px; opacity: 0.45; direction: ltr; }
-  #toast {
-    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-    background: rgba(16,20,30,0.95); padding: 18px 40px; border-radius: 16px; font-size: 28px;
-    opacity: 0; transition: opacity .2s; z-index: 10;
-  }
-  #toast.show { opacity: 1; }
-  #empty { font-size: 26px; color: var(--muted); }
+  footer { display:flex; justify-content:space-between; font-size:20px; color:var(--muted); padding-top:6px; }
+  #diag { font-size:15px; opacity:.45; }
+  #toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:rgba(16,20,30,.95); padding:16px 36px;
+    border-radius:16px; font-size:26px; opacity:0; transition:opacity .2s; z-index:10; }
+  #toast.show { opacity:1; }
+  #empty { font-size:24px; color:var(--muted); }
 </style>
 </head>
 <body>
 <div id="wall"></div><div id="shade"></div>
 <div id="stage">
-  <header>
-    <div>
-      <div id="time">--:--</div>
-      <div id="date"></div>
-      <div id="greet"></div>
-    </div>
-    <div class="weather">
-      <div id="wtemp"></div>
-      <div id="wdesc"></div>
-    </div>
-  </header>
-
-  <div id="prayers"></div>
-
+  <div id="top">
+    <div id="time">--:--</div>
+    <div id="date"></div>
+    <div id="hijri"></div>
+    <div id="greet"></div>
+    <div id="weather"></div>
+    <div id="prayers"></div>
+  </div>
   <div id="rows"><div id="scroller">
-    <section class="row fav"><h2>المفضلة</h2><div class="tiles" id="favTiles"></div></section>
-    <section class="row all"><h2>كل التطبيقات</h2><div class="tiles" id="allTiles"></div></section>
-  </div></div>
-
-  <footer>
-    <span>OK فتح · اضغط OK مطوّل للمفضلة · Back خروج</span>
-    <span id="diag"></span>
-  </footer>
+    <section class="row fav"><h2>Favorites</h2><div class="tiles" id="favTiles"></div></section>
+    <section class="row all"><h2>All apps</h2><div class="tiles" id="allTiles"></div></section>
+  </div><div id="label"></div></div>
+  <footer><span>OK open · Hold OK add/remove favorite · Back hide</span><span id="diag"></span></footer>
 </div>
 <div id="toast"></div>
 
@@ -111,35 +84,33 @@
   'use strict';
 
   /* ================= settings ================= */
-  var CITY = { name: 'دبي', en: 'Dubai', country: 'AE', lat: 25.2048, lon: 55.2708, method: 16 };
-  var FAV_KEY = 'amrhome.favs.v2';
-  var DEFAULT_FAVS = ['youtube (no ads)', 'netflix', 'shahid', 'prime', 'disney', 'osn', 'starz', 'apple tv', 'spotify'];
-  var HIDE = /^(TizenBrew|TizenBrewNextGeneration|Home|Web Browser Service|Samsung Promotion|e-Manual|SmartThings|Samsung Health|Universal Guide|Samsung TV Plus|Bixby|Alexa|Google Assistant|Samsung Account|Settings)$/i;
-  /* Fallback list of common Samsung Tizen app IDs (used only if the TV refuses to list apps) */
+  var CITY = { name: 'Dubai', country: 'AE', lat: 25.2048, lon: 55.2708, method: 16 };
+  var BG_URL = 'https://gist.githubusercontent.com/amrelkamhawy/c48bc87aa75fab3432fd8b53535c4275/raw/bg.txt';
+  var BG_KEY = 'amrhome.bg.v1';
+  var SVC = 'http://127.0.0.1:8085';
+  var FAV_KEY = 'amrhome.favs.v3';
+  var DEFAULT_FAVS = ['youtube (no ads)', 'netflix', 'shahid', 'iptv', 'playstation', 'prime', 'yango', 'disney', 'apple tv'];
+  var HIDE = /^(TizenBrew|TizenBrewNextGeneration|Home|Web Browser Service|Samsung Promotion|e-Manual|SmartThings|Samsung Health|Universal Guide|Bixby|Alexa|Google Assistant|Samsung Account|Settings|Source|Sources|Media Player|Gallery Service|.*Service|.*Widget)$/i;
   var KNOWN = [
     { name: 'Netflix', ids: ['3201907018807', '11101200001'] },
     { name: 'YouTube', ids: ['111299001912'] },
     { name: 'Prime Video', ids: ['3201910019365', '3201512006785'] },
     { name: 'Disney+', ids: ['3201901017640'] },
     { name: 'Apple TV', ids: ['3201807016597'] },
-    { name: 'Spotify', ids: ['3201606009684'] },
-    { name: 'Internet', ids: ['org.tizen.browser', 'com.samsung.tv.browser'] }
+    { name: 'Spotify', ids: ['3201606009684'] }
   ];
   var BRAND = [
     [/netflix/i, '#e50914', 'N'], [/youtube/i, '#ff0033', '▶'], [/shahid|mbc/i, '#12b394', 'S'],
     [/prime/i, '#00a8e1', 'P'], [/disney/i, '#113ccf', 'D+'], [/apple/i, '#2a2a2e', 'tv'],
-    [/spotify/i, '#1db954', 'S'], [/osn/i, '#14306e', 'OSN'], [/starz/i, '#1b1b1b', 'S'],
-    [/الشرق|asharq/i, '#c4001a', 'NOW'], [/internet|browser/i, '#3b6fd8', 'www'], [/karaoke/i, '#ff7a1a', '♪']
+    [/spotify/i, '#1db954', 'S'], [/osn/i, '#14306e', 'OSN'], [/starz/i, '#1b1b1b', 'S'], [/iptv/i, '#1d3fd6', 'TV'],
+    [/playstation|ps /i, '#0070d1', 'PS'], [/yango/i, '#7b2ff7', 'Y'], [/internet|browser/i, '#3b6fd8', 'www']
   ];
 
   /* ================= helpers ================= */
   function $(id) { return document.getElementById(id); }
   function load(k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
   function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
-  function toast(msg) {
-    var t = $('toast'); t.textContent = msg; t.className = 'show';
-    clearTimeout(toast._t); toast._t = setTimeout(function () { t.className = ''; }, 2000);
-  }
+  function toast(msg) { var t = $('toast'); t.textContent = msg; t.className = 'show'; clearTimeout(toast._t); toast._t = setTimeout(function () { t.className = ''; }, 2200); }
   var diagParts = {};
   function diag(k, v) { diagParts[k] = v; var s = []; for (var x in diagParts) s.push(x + ':' + diagParts[x]); $('diag').textContent = s.join(' · '); }
   function brandOf(name) {
@@ -147,78 +118,77 @@
     var h = 0; for (var j = 0; j < name.length; j++) h = (h * 31 + name.charCodeAt(j)) % 360;
     return [null, 'hsl(' + h + ',45%,34%)', name.charAt(0).toUpperCase()];
   }
-  function getJSON(url, ok, fail) {
-    var x = new XMLHttpRequest(); x.open('GET', url); x.timeout = 10000;
-    x.onload = function () { try { ok(JSON.parse(x.responseText)); } catch (e) { if (fail) fail(e); } };
-    x.onerror = x.ontimeout = function () { if (fail) fail(); };
+  function req(url, ok, fail, asText) {
+    var x = new XMLHttpRequest(); x.open('GET', url); x.timeout = 12000;
+    x.onload = function () { if (x.status !== 200) return fail && fail(x.status); try { ok(asText ? x.responseText : JSON.parse(x.responseText)); } catch (e) { if (fail) fail(e); } };
+    x.onerror = x.ontimeout = function () { if (fail) fail('net'); };
     x.send();
   }
   function pad(n) { return (n < 10 ? '0' : '') + n; }
-  function fmt12(h, m) { return (h % 12 || 12) + ':' + pad(m); }
+  function fmt12(h, m) { return (h % 12 || 12) + ':' + pad(m) + (h < 12 ? ' AM' : ' PM'); }
 
-  /* ================= wallpaper (changes daily) ================= */
+  /* ================= wallpaper (fixed photo, cached on the TV) ================= */
+  function showWall(src) { $('wall').style.backgroundImage = 'url(' + src + ')'; $('wall').className = 'on'; }
   (function () {
-    var d = new Date(), seed = 'amr' + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate());
-    var img = new Image();
-    img.onload = function () { $('wall').style.backgroundImage = 'url(' + img.src + ')'; $('wall').className = 'on'; };
-    img.src = 'https://picsum.photos/seed/' + seed + '/1920/1080';
+    var cached = null; try { cached = localStorage.getItem(BG_KEY); } catch (e) {}
+    if (cached) return showWall(cached);
+    req(BG_URL, function (txt) {
+      txt = txt.replace(/\s+/g, '');
+      if (txt.indexOf('data:image') === 0) { try { localStorage.setItem(BG_KEY, txt); } catch (e) {} showWall(txt); }
+    }, function () { showWall('https://picsum.photos/seed/amrhome/1920/1080'); }, true);
   })();
 
-  /* ================= clock ================= */
-  var DAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-  var MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-  var hijri = '';
+  /* ================= clock / date ================= */
+  var DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   function tick() {
-    var d = new Date(), h = d.getHours();
-    $('time').textContent = fmt12(h, d.getMinutes());
-    $('date').textContent = DAYS[d.getDay()] + '، ' + d.getDate() + ' ' + MONTHS[d.getMonth()] + (hijri ? '  ·  ' + hijri : '');
-    $('greet').textContent = h < 5 ? 'تصبح على خير 🌙' : h < 12 ? 'صباح الخير ☀️' : h < 18 ? 'مساء النور 🌤️' : 'مساء الخير 🌙';
+    var d = new Date(), h = d.getHours(), m = d.getMinutes();
+    $('time').textContent = (h % 12 || 12) + ':' + pad(m);
+    $('date').textContent = DAYS[d.getDay()] + ', ' + d.getDate() + ' ' + MONTHS[d.getMonth()];
+    $('greet').textContent = h < 5 ? 'Good night' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
     renderPrayers();
   }
 
   /* ================= weather ================= */
-  var WCODE = { 0: 'صافي', 1: 'صافي غالبًا', 2: 'غائم جزئيًا', 3: 'غائم', 45: 'شبورة', 48: 'شبورة', 51: 'رذاذ', 53: 'رذاذ', 61: 'مطر خفيف', 63: 'مطر', 65: 'مطر غزير', 80: 'زخات مطر', 95: 'عاصفة رعدية' };
+  var WCODE = { 0: 'Clear', 1: 'Mostly clear', 2: 'Partly cloudy', 3: 'Cloudy', 45: 'Fog', 48: 'Fog', 51: 'Drizzle', 53: 'Drizzle', 61: 'Light rain', 63: 'Rain', 65: 'Heavy rain', 80: 'Showers', 95: 'Thunderstorm' };
   function weather() {
-    getJSON('https://api.open-meteo.com/v1/forecast?latitude=' + CITY.lat + '&longitude=' + CITY.lon + '&current=temperature_2m,weather_code&timezone=auto',
-      function (j) { var c = j.current; $('wtemp').textContent = Math.round(c.temperature_2m) + '°'; $('wdesc').textContent = CITY.name + ' · ' + (WCODE[c.weather_code] || ''); });
+    req('https://api.open-meteo.com/v1/forecast?latitude=' + CITY.lat + '&longitude=' + CITY.lon + '&current=temperature_2m,weather_code&timezone=auto',
+      function (j) { var c = j.current; $('weather').textContent = Math.round(c.temperature_2m) + '°  ' + CITY.name + ' · ' + (WCODE[c.weather_code] || ''); });
   }
 
-  /* ================= prayer times (Aladhan) ================= */
-  var PR = [['Fajr', 'الفجر'], ['Sunrise', 'الشروق'], ['Dhuhr', 'الظهر'], ['Asr', 'العصر'], ['Maghrib', 'المغرب'], ['Isha', 'العشاء']];
+  /* ================= prayer times ================= */
+  var PR = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
   var times = null, timesDay = '';
   function loadPrayers() {
     var d = new Date(), key = d.getDate() + '-' + (d.getMonth() + 1) + '-' + d.getFullYear();
     if (timesDay === key && times) return;
-    getJSON('https://api.aladhan.com/v1/timingsByCity/' + key + '?city=' + CITY.en + '&country=' + CITY.country + '&method=' + CITY.method,
+    req('https://api.aladhan.com/v1/timingsByCity/' + key + '?city=' + CITY.name + '&country=' + CITY.country + '&method=' + CITY.method,
       function (j) {
         times = j.data.timings; timesDay = key;
-        try { var hj = j.data.date.hijri; hijri = hj.day + ' ' + hj.month.ar + ' ' + hj.year + 'هـ'; } catch (e) {}
+        try { var hj = j.data.date.hijri; $('hijri').textContent = hj.day + ' ' + hj.month.en + ' ' + hj.year + ' AH'; } catch (e) {}
         tick();
       }, function () { diag('pray', 'err'); });
   }
   function renderPrayers() {
     if (!times) return;
     var now = new Date(), nowMin = now.getHours() * 60 + now.getMinutes(), nextIdx = -1, html = '';
-    var mins = PR.map(function (p) { var s = (times[p[0]] || '0:0').split(' ')[0].split(':'); return (+s[0]) * 60 + (+s[1]); });
+    var mins = PR.map(function (p) { var s = (times[p] || '0:0').split(' ')[0].split(':'); return (+s[0]) * 60 + (+s[1]); });
     for (var i = 0; i < PR.length; i++) if (i !== 1 && mins[i] > nowMin) { nextIdx = i; break; }
     if (nextIdx === -1) nextIdx = 0;
     for (var k = 0; k < PR.length; k++) {
       var m = mins[k], left = '';
-      if (k === nextIdx) {
-        var diff = (m - nowMin + 1440) % 1440;
-        left = '<div class="left">باقي ' + Math.floor(diff / 60) + ':' + pad(diff % 60) + '</div>';
-      }
-      html += '<div class="pr' + (k === nextIdx ? ' next' : '') + '"><div class="n">' + PR[k][1] + '</div><div class="t">' + fmt12(Math.floor(m / 60), m % 60) + '</div>' + left + '</div>';
+      if (k === nextIdx) { var diff = (m - nowMin + 1440) % 1440; left = '<span class="left">in ' + Math.floor(diff / 60) + 'h ' + pad(diff % 60) + 'm</span>'; }
+      html += '<div class="pr' + (k === nextIdx ? ' next' : '') + '"><span>' + PR[k] + left + '</span><span class="t">' + fmt12(Math.floor(m / 60), m % 60) + '</span></div>';
     }
     $('prayers').innerHTML = html;
   }
 
-  /* ================= apps: several sources ================= */
-  var apps = [], favs = load(FAV_KEY, null), remote = null, favsSaved = !!favs; if (!favs) favs = [];
-
+  /* ================= apps ================= */
+  var apps = [], favs = load(FAV_KEY, null), favsSaved = !!favs, svcOk = false;
+  if (!favs) favs = [];
   function addApp(a) { for (var i = 0; i < apps.length; i++) if (apps[i].name.toLowerCase() === a.name.toLowerCase()) return; apps.push(a); }
 
-  /* 1) TizenBrew modules (TizenTube etc.) */
+  /* TizenBrew modules (TizenTube...) */
   var tbws = null;
   function loadModules(cb) {
     var done = false; function fin() { if (!done) { done = true; cb(); } }
@@ -230,6 +200,7 @@
         if (msg.type === 4 && msg.payload) {
           for (var i = 0; i < msg.payload.length; i++) {
             var m = msg.payload[i];
+            if (m && /amr-tv-home/.test(m.fullName || '') && m.serviceFile) { try { tbws.send(JSON.stringify({ type: 6, payload: m })); } catch (e) {} }
             if (!m || !m.appName || m.packageType === 'service' || /amr-tv-home/.test(m.fullName || '')) continue;
             addApp({ key: 'mod:' + m.fullName, name: /tizentube/i.test(m.fullName || '') ? 'YouTube (No Ads)' : m.appName, kind: 'module', module: m });
           }
@@ -240,94 +211,36 @@
     } catch (e) { fin(); }
   }
 
-  /* 2) Tizen Web API */
-  function loadTizen(cb) {
-    if (typeof tizen === 'undefined' || !tizen.application) { diag('tz', 'none'); return cb(false); }
-    try {
-      tizen.application.getAppsInfo(function (list) {
-        var n = 0;
-        for (var i = 0; i < list.length; i++) {
-          var a = list[i];
-          if (a.show === false || !a.name || HIDE.test(a.name)) continue;
-          var icon = a.iconPath || ''; if (icon && icon.charAt(0) === '/') icon = 'file://' + icon;
-          addApp({ key: 'app:' + a.id, name: a.name, kind: 'app', id: a.id, icon: icon }); n++;
-        }
-        diag('tz', n); cb(n > 0);
-      }, function (e) { diag('tz', 'err ' + (e && e.name)); cb(false); });
-    } catch (e) { diag('tz', 'ex ' + (e && e.name)); cb(false); }
+  /* Installed TV apps via our background service (retries while it starts) */
+  function loadService(cb, tries) {
+    tries = tries || 0;
+    req(SVC + '/apps', function (j) {
+      if (!j.ok) { diag('svc', 'err ' + j.error); return cb(false); }
+      var n = 0;
+      for (var i = 0; i < j.apps.length; i++) {
+        var a = j.apps[i];
+        if (a.show === false || !a.name || HIDE.test(a.name)) continue;
+        addApp({ key: 'app:' + a.id, name: a.name, kind: 'app', id: a.id, icon: a.icon ? SVC + '/icon?path=' + encodeURIComponent(a.icon) : '' }); n++;
+      }
+      svcOk = true; diag('svc', n); cb(n > 0);
+    }, function () {
+      if (tries < 10) return setTimeout(function () { loadService(cb, tries + 1); }, 1000);
+      diag('svc', 'off'); cb(false);
+    });
   }
-
-  /* 3) Samsung TV remote-control API on the TV itself (asks once for permission on screen) */
-  function loadRemote(cb) {
-    var done = false; function fin(ok) { if (!done) { done = true; cb(ok); } }
-    var tries = ['ws://127.0.0.1:8001/api/v2/channels/samsung.remote.control?name=' + btoa('Home'),
-                 'wss://127.0.0.1:8002/api/v2/channels/samsung.remote.control?name=' + btoa('Home') + (load('amrhome.token', '') ? '&token=' + load('amrhome.token', '') : '')];
-    function attempt(i) {
-      if (i >= tries.length) { diag('rc', 'no'); return fin(false); }
-      var w; try { w = new WebSocket(tries[i]); } catch (e) { return attempt(i + 1); }
-      var opened = false;
-      var to = setTimeout(function () { if (!opened) { try { w.close(); } catch (e) {} attempt(i + 1); } }, 20000);
-      w.onmessage = function (ev) {
-        var m; try { m = JSON.parse(ev.data); } catch (e) { return; }
-        if (m.event === 'ms.channel.connect') {
-          opened = true; clearTimeout(to); remote = w;
-          if (m.data && m.data.token) save('amrhome.token', m.data.token);
-          w.send(JSON.stringify({ method: 'ms.channel.emit', params: { event: 'ed.installedApp.get', to: 'host' } }));
-        } else if (m.event === 'ed.installedApp.get') {
-          var list = (m.data && m.data.data) || [], n = 0;
-          for (var k = 0; k < list.length; k++) {
-            var a = list[k]; if (!a.name || HIDE.test(a.name)) continue;
-            addApp({ key: 'app:' + a.appId, name: a.name, kind: 'app', id: a.appId, appType: a.app_type, iconPath: a.icon }); n++;
-          }
-          diag('rc', n); fin(n > 0); requestIcons();
-        } else if (m.event === 'ed.apps.icon' && m.data && m.data.imageBase64) {
-          iconArrived(m.data.iconPath, m.data.imageBase64);
-        } else if (m.event === 'ms.channel.unauthorized') { clearTimeout(to); attempt(i + 1); }
-      };
-      w.onerror = function () { clearTimeout(to); if (!opened) attempt(i + 1); };
-    }
-    attempt(0);
-  }
-  var iconQueue = [];
-  function requestIcons() {
-    for (var i = 0; i < apps.length; i++) if (apps[i].iconPath) iconQueue.push(apps[i].iconPath);
-    (function next() {
-      if (!iconQueue.length || !remote) return;
-      remote.send(JSON.stringify({ method: 'ms.channel.emit', params: { event: 'ed.apps.icon', to: 'host', data: { iconPath: iconQueue.shift() } } }));
-      setTimeout(next, 120);
-    })();
-  }
-  function iconArrived(path, b64) {
-    for (var i = 0; i < apps.length; i++) if (apps[i].iconPath === path) { apps[i].icon = 'data:image/png;base64,' + b64; }
-    clearTimeout(iconArrived._t); iconArrived._t = setTimeout(function () { render(cur && cur.getAttribute('data-key'), cur && cur.getAttribute('data-row')); }, 400);
-  }
-
-  /* 4) Known IDs (last resort) */
-  function loadKnown() {
-    for (var i = 0; i < KNOWN.length; i++) addApp({ key: 'known:' + KNOWN[i].name, name: KNOWN[i].name, kind: 'app', ids: KNOWN[i].ids });
-    diag('known', KNOWN.length);
-  }
+  function loadKnown() { for (var i = 0; i < KNOWN.length; i++) addApp({ key: 'known:' + KNOWN[i].name, name: KNOWN[i].name, kind: 'app', ids: KNOWN[i].ids }); diag('known', KNOWN.length); }
 
   /* ================= launching ================= */
-  function launchId(ids, i, name) {
-    if (i >= ids.length) return toast('مقدرتش أفتح ' + name);
-    var id = ids[i];
+  function launchIds(ids, i, name) {
+    if (i >= ids.length) return toast('Could not open ' + name);
+    if (svcOk) return req(SVC + '/launch?id=' + encodeURIComponent(ids[i]), function (j) { if (!j.ok) launchIds(ids, i + 1, name); }, function () { launchIds(ids, i + 1, name); });
     if (typeof tizen !== 'undefined' && tizen.application) {
-      try {
-        tizen.application.launch(id, null, function () {
-          if (remote) remoteLaunch(id); else launchId(ids, i + 1, name);
-        });
-        return;
-      } catch (e) {}
+      try { tizen.application.launch(ids[i], null, function () { launchIds(ids, i + 1, name); }); return; } catch (e) {}
     }
-    if (remote) remoteLaunch(id); else launchId(ids, i + 1, name);
-  }
-  function remoteLaunch(id, type) {
-    remote.send(JSON.stringify({ method: 'ms.channel.emit', params: { event: 'ed.apps.launch', to: 'host',
-      data: { appId: id, action_type: type === 2 ? 'DEEP_LINK' : 'NATIVE_LAUNCH' } } }));
+    launchIds(ids, i + 1, name);
   }
   function launch(item) {
-    toast('جاري فتح ' + item.name + '…');
+    toast('Opening ' + item.name + '…');
     if (item.kind === 'module') {
       var m = item.module;
       try { for (var i = 0; i < (m.keys || []).length; i++) tizen.tvinputdevice.registerKey(m.keys[i]); } catch (e) {}
@@ -335,42 +248,36 @@
       if (!m.evaluateScriptOnDocumentStart && m.appPath) setTimeout(function () { location.href = m.appPath; }, 150);
       return;
     }
-    if (item.appType !== undefined && remote) return remoteLaunch(item.id, item.appType);
-    launchId(item.ids || [item.id], 0, item.name);
+    launchIds(item.ids || [item.id], 0, item.name);
   }
 
   /* ================= rendering ================= */
   function byKey(k) { for (var i = 0; i < apps.length; i++) if (apps[i].key === k) return apps[i]; return null; }
-  function isFav(k) { return favs.indexOf(k) !== -1; }
   function makeTile(item, inFav) {
     var el = document.createElement('div');
     el.className = 'tile'; el.setAttribute('data-key', item.key); el.setAttribute('data-row', inFav ? 'fav' : 'all');
     var b = brandOf(item.name);
     el.style.background = 'linear-gradient(145deg, ' + b[1] + ', rgba(0,0,0,0.45))';
-    var letter = document.createElement('div'); letter.className = 'letter'; letter.textContent = b[2] || item.name.charAt(0);
-    el.appendChild(letter);
+    var letter = document.createElement('div'); letter.className = 'letter'; letter.textContent = b[2] || item.name.charAt(0); el.appendChild(letter);
     if (item.icon) {
       var img = new Image();
-      img.onload = function () { if (letter.parentNode) el.replaceChild(img, letter); };
+      img.onload = function () { if (letter.parentNode) { el.replaceChild(img, letter); el.className += ' hasicon'; } };
       img.src = item.icon;
     }
     var nm = document.createElement('div'); nm.className = 'name'; nm.textContent = item.name; el.appendChild(nm);
-    if (!inFav && isFav(item.key)) { var s = document.createElement('div'); s.className = 'star'; s.textContent = '★'; el.appendChild(s); }
+    if (!inFav && favs.indexOf(item.key) !== -1) { var s = document.createElement('div'); s.className = 'star'; s.textContent = '★'; el.appendChild(s); }
     return el;
   }
   function render(keepKey, keepRow) {
     var fav = $('favTiles'), all = $('allTiles'); fav.innerHTML = ''; all.innerHTML = '';
     var shown = 0;
     for (var i = 0; i < favs.length; i++) { var it = byKey(favs[i]); if (it) { fav.appendChild(makeTile(it, true)); shown++; } }
-    if (!shown) { var e = document.createElement('div'); e.id = 'empty'; e.textContent = 'اضغط OK مطوّل على أي تطبيق تحت عشان تضيفه هنا'; fav.appendChild(e); }
+    if (!shown) { var e = document.createElement('div'); e.id = 'empty'; e.textContent = 'Hold OK on any app below to pin it here'; fav.appendChild(e); }
     var sorted = apps.slice().sort(function (a, b) { return a.name.localeCompare(b.name); });
     for (var j = 0; j < sorted.length; j++) all.appendChild(makeTile(sorted[j], false));
-    var target = null;
-    if (keepKey) {
-      var tiles = document.querySelectorAll('.tile');
-      for (var t = 0; t < tiles.length; t++) if (tiles[t].getAttribute('data-key') === keepKey && (!target || tiles[t].getAttribute('data-row') === keepRow)) target = tiles[t];
-    }
-    focus(target || document.querySelector('.tile'));
+    var target = null, tiles = document.querySelectorAll('.tile');
+    if (keepKey) for (var t = 0; t < tiles.length; t++) if (tiles[t].getAttribute('data-key') === keepKey && (!target || tiles[t].getAttribute('data-row') === keepRow)) target = tiles[t];
+    focus(target || tiles[0]);
   }
 
   /* ================= navigation ================= */
@@ -385,6 +292,11 @@
     if (top - 60 < t) t = Math.max(0, top - 60);
     if (top + h + 30 > t + view) t = top + h + 30 - view;
     sc.style.transform = 'translateY(' + (-t) + 'px)';
+    var it = byKey(el.getAttribute('data-key')), lb = $('label');
+    if (it && el.className.indexOf('hasicon') !== -1) {
+      lb.textContent = it.name; lb.style.display = 'block';
+      setTimeout(function () { lb.style.left = (el.offsetLeft + 40) + 'px'; lb.style.top = (el.offsetTop + el.offsetHeight + 30 - t) + 'px'; }, 0);
+    } else lb.style.display = 'none';
   }
   function move(dir) {
     if (!cur) return focus(document.querySelector('.tile'));
@@ -405,10 +317,9 @@
   function toggleFav() {
     if (!cur) return;
     var k = cur.getAttribute('data-key'), row = cur.getAttribute('data-row'), it = byKey(k), idx = favs.indexOf(k);
-    if (idx === -1) { favs.push(k); toast('اتضاف للمفضلة ★ ' + it.name); } else { favs.splice(idx, 1); toast('اتشال من المفضلة'); }
-    save(FAV_KEY, favs); render(k, row);
+    if (idx === -1) { favs.push(k); toast('★ Added ' + it.name + ' to favorites'); } else { favs.splice(idx, 1); toast('Removed from favorites'); }
+    save(FAV_KEY, favs); favsSaved = true; render(k, row);
   }
-
   var okTimer = null, okLong = false;
   document.addEventListener('keydown', function (e) {
     switch (e.keyCode) {
@@ -416,10 +327,7 @@
       case 39: move('right'); break;
       case 38: move('up'); break;
       case 40: move('down'); break;
-      case 13:
-        if (e.repeat || okTimer) break;
-        okLong = false; okTimer = setTimeout(function () { okLong = true; toggleFav(); }, 700);
-        break;
+      case 13: if (e.repeat || okTimer) break; okLong = false; okTimer = setTimeout(function () { okLong = true; toggleFav(); }, 700); break;
       case 403: toggleFav(); break;
       case 10009: try { tizen.application.getCurrentApplication().hide(); } catch (err) {} break;
       default: return;
@@ -441,24 +349,15 @@
         if (apps[j].name.toLowerCase().indexOf(DEFAULT_FAVS[i]) !== -1 && out.indexOf(apps[j].key) === -1) { out.push(apps[j].key); break; }
     return out.slice(0, 6);
   }
-  function finishApps() {
-    if (!favsSaved) { favs = defaultFavs(); save(FAV_KEY, favs); favsSaved = true; }
-    render();
-  }
-
   tick(); setInterval(tick, 15000);
   weather(); setInterval(weather, 30 * 60 * 1000);
   loadPrayers(); setInterval(loadPrayers, 60 * 60 * 1000);
-
   loadModules(function () {
     render();
-    loadTizen(function (ok) {
-      if (ok) return finishApps();
-      toast('لو ظهرت رسالة على الشاشة تطلب إذن، اختار Allow');
-      loadRemote(function (ok2) {
-        if (!ok2) loadKnown();
-        finishApps();
-      });
+    loadService(function (ok) {
+      if (!ok) loadKnown();
+      if (!favsSaved) { favs = defaultFavs(); if (svcOk) { save(FAV_KEY, favs); favsSaved = true; } }
+      render();
     });
   });
 })();

@@ -1,6 +1,6 @@
 {
   "name": "amr-tv-home",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Clean, ad-free home screen for Samsung Tizen TVs (TizenBrew app module)",
   "packageType": "app",
   "appName": "Home",
@@ -13,5 +13,6 @@
     "MediaPlayPause",
     "Info"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "serviceFile": "service.js"
 }
