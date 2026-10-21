@@ -4,81 +4,73 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=1920, height=1080">
 <title>Home</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0b0f17;
-    --panel: rgba(255,255,255,0.05);
-    --text: #f2f4f8;
-    --muted: #8a94a8;
-    --accent: #e8b04a;
-    --focus: #ffffff;
+    --text: #f4f6fa;
+    --muted: rgba(235,240,250,0.68);
+    --accent: #f2c36b;
+    --glass: rgba(14,18,28,0.42);
+    --line: rgba(255,255,255,0.12);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
-    width: 1920px; height: 1080px; overflow: hidden;
-    background: var(--bg); color: var(--text);
-    font-family: "SamsungOne", "Samsung Sans", "Segoe UI", Tahoma, Arial, sans-serif;
-    cursor: none;
+    width: 1920px; height: 1080px; overflow: hidden; background: #0a0d14; color: var(--text);
+    font-family: "Tajawal", "SamsungOne", Tahoma, Arial, sans-serif; cursor: none;
   }
-  #bg {
-    position: fixed; inset: 0; z-index: 0;
-    background:
-      radial-gradient(1200px 700px at 85% -10%, rgba(232,176,74,0.16), transparent 60%),
-      radial-gradient(1000px 800px at 0% 110%, rgba(70,110,200,0.18), transparent 60%),
-      linear-gradient(180deg, #0d121c 0%, #090c12 100%);
-    transition: background 1.2s;
-  }
-  #stage { position: relative; z-index: 1; height: 1080px; padding: 48px 96px 32px; display: flex; flex-direction: column; }
+  #wall { position: fixed; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.5s; }
+  #wall.on { opacity: 1; }
+  #shade { position: fixed; inset: 0;
+    background: linear-gradient(180deg, rgba(6,9,15,0.55) 0%, rgba(6,9,15,0.35) 30%, rgba(6,9,15,0.82) 62%, rgba(6,9,15,0.95) 100%); }
+  #stage { position: relative; z-index: 1; height: 1080px; padding: 46px 90px 26px; display: flex; flex-direction: column; }
 
-  /* Header */
-  header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 18px; }
-  .clock { direction: ltr; text-align: right; }
-  #time { font-size: 104px; font-weight: 300; letter-spacing: -2px; line-height: 1; }
-  #date { font-size: 32px; color: var(--muted); margin-top: 10px; }
-  #greet { font-size: 36px; margin-top: 6px; color: var(--accent); }
-  .weather { text-align: left; direction: ltr; }
-  #wtemp { font-size: 72px; font-weight: 300; line-height: 1; }
-  #wdesc { font-size: 28px; color: var(--muted); margin-top: 8px; }
+  header { display: flex; justify-content: space-between; align-items: flex-start; }
+  #time { font-size: 120px; font-weight: 300; line-height: 1; direction: ltr; text-align: right; letter-spacing: -1px; }
+  #date { font-size: 34px; color: var(--muted); margin-top: 6px; }
+  #greet { font-size: 34px; color: var(--accent); margin-top: 4px; font-weight: 500; }
+  .weather { text-align: left; }
+  #wtemp { font-size: 76px; font-weight: 300; line-height: 1; direction: ltr; }
+  #wdesc { font-size: 30px; color: var(--muted); margin-top: 6px; }
 
-  /* Rows */
-  #rows { flex: 1; overflow: hidden; position: relative; margin: 0 -40px; padding: 20px 40px 0; }
+  /* prayer strip */
+  #prayers { display: flex; gap: 14px; margin: 26px 0 26px; }
+  .pr { flex: 1; background: var(--glass); border: 1px solid var(--line); border-radius: 18px; padding: 12px 10px; text-align: center; }
+  .pr .n { font-size: 26px; color: var(--muted); }
+  .pr .t { font-size: 36px; font-weight: 500; direction: ltr; margin-top: 2px; }
+  .pr.next { background: rgba(242,195,107,0.18); border-color: var(--accent); }
+  .pr.next .n { color: var(--accent); }
+  .pr .left { font-size: 22px; color: var(--accent); margin-top: 2px; direction: rtl; }
+
+  #rows { flex: 1; overflow: hidden; position: relative; margin: 0 -40px; padding: 18px 40px 0; }
   #scroller { transition: transform .25s ease-out; }
-  .row { margin-bottom: 34px; }
-  .row h2 { font-size: 30px; font-weight: 500; color: var(--muted); margin: 0 6px 18px; }
-  .tiles { display: flex; flex-wrap: wrap; gap: 26px; }
-
+  .row { margin-bottom: 30px; }
+  .row h2 { font-size: 30px; font-weight: 500; color: var(--muted); margin: 0 4px 16px; }
+  .tiles { display: flex; flex-wrap: wrap; gap: 24px; }
   .tile {
     position: relative; border-radius: 22px; overflow: hidden;
-    background: var(--panel);
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    transition: transform .15s ease-out, box-shadow .15s ease-out, background .15s;
-    outline: none;
+    transition: transform .15s ease-out, box-shadow .15s ease-out;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
   }
-  .fav .tile { width: 262px; height: 176px; }
-  .all .tile { width: 222px; height: 136px; }
-  .tile img { max-width: 46%; max-height: 52%; object-fit: contain; }
-  .tile .letter { font-size: 60px; font-weight: 700; color: rgba(255,255,255,0.95); direction: ltr; margin-bottom: 22px; }
-  .all .tile .letter { font-size: 48px; }
+  .fav .tile { width: 266px; height: 168px; }
+  .all .tile { width: 202px; height: 124px; }
+  .tile img { max-width: 56%; max-height: 58%; object-fit: contain; margin-bottom: 18px; }
+  .tile .letter { font-size: 58px; font-weight: 700; color: #fff; direction: ltr; margin-bottom: 20px; font-family: Arial, sans-serif; }
+  .all .tile .letter { font-size: 44px; }
   .tile .name {
-    position: absolute; bottom: 12px; left: 12px; right: 12px; text-align: center;
-    font-size: 22px; color: rgba(255,255,255,0.85);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: ltr;
+    position: absolute; bottom: 10px; left: 10px; right: 10px; text-align: center;
+    font-size: 22px; font-weight: 500; color: rgba(255,255,255,0.92);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .tile .star { position: absolute; top: 12px; left: 14px; font-size: 22px; color: var(--accent); }
-  .tile.focused {
-    transform: scale(1.08);
-    box-shadow: 0 0 0 5px var(--focus), 0 18px 50px rgba(0,0,0,0.6);
-    z-index: 2;
-  }
+  .tile .star { position: absolute; top: 10px; left: 12px; font-size: 22px; color: var(--accent); }
+  .tile.focused { transform: scale(1.09); box-shadow: 0 0 0 5px #fff, 0 20px 50px rgba(0,0,0,0.6); z-index: 2; }
 
-  footer {
-    display: flex; gap: 40px; justify-content: center; font-size: 22px; color: var(--muted);
-    padding-top: 14px;
-  }
-  .dot { display: inline-block; width: 18px; height: 18px; border-radius: 50%; vertical-align: -2px; margin-left: 8px; }
+  footer { display: flex; justify-content: space-between; font-size: 22px; color: var(--muted); padding-top: 8px; }
+  #diag { font-size: 16px; opacity: 0.45; direction: ltr; }
   #toast {
-    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
-    background: rgba(20,24,34,0.95); padding: 18px 36px; border-radius: 16px; font-size: 26px;
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    background: rgba(16,20,30,0.95); padding: 18px 40px; border-radius: 16px; font-size: 28px;
     opacity: 0; transition: opacity .2s; z-index: 10;
   }
   #toast.show { opacity: 1; }
@@ -86,10 +78,10 @@
 </style>
 </head>
 <body>
-<div id="bg"></div>
+<div id="wall"></div><div id="shade"></div>
 <div id="stage">
   <header>
-    <div class="clock">
+    <div>
       <div id="time">--:--</div>
       <div id="date"></div>
       <div id="greet"></div>
@@ -100,14 +92,16 @@
     </div>
   </header>
 
+  <div id="prayers"></div>
+
   <div id="rows"><div id="scroller">
     <section class="row fav"><h2>المفضلة</h2><div class="tiles" id="favTiles"></div></section>
     <section class="row all"><h2>كل التطبيقات</h2><div class="tiles" id="allTiles"></div></section>
   </div></div>
 
   <footer>
-    <span>اضغط OK مطوّل: إضافة / شيل من المفضلة</span>
-        <span>OK فتح · Back خروج</span>
+    <span>OK فتح · اضغط OK مطوّل للمفضلة · Back خروج</span>
+    <span id="diag"></span>
   </footer>
 </div>
 <div id="toast"></div>
@@ -116,177 +110,280 @@
 (function () {
   'use strict';
 
-  /* ---------- settings ---------- */
-  var CITY = { name: 'دبي', lat: 25.2048, lon: 55.2708 };
-  var FAV_KEY = 'amrhome.favs.v1';
-  var DEFAULT_FAVS = ['youtube (no ads)', 'netflix', 'shahid', 'prime', 'disney', 'osn', 'starz', 'apple tv', 'spotify', 'الشرق'];
-  var HIDE = /^(TizenBrew|Home|Web Browser Service|Samsung Promotion|e-Manual|Gallery|SmartThings|Samsung Health|Universal Guide|Samsung TV Plus|Bixby|Alexa|Google Assistant)$/i;
+  /* ================= settings ================= */
+  var CITY = { name: 'دبي', en: 'Dubai', country: 'AE', lat: 25.2048, lon: 55.2708, method: 16 };
+  var FAV_KEY = 'amrhome.favs.v2';
+  var DEFAULT_FAVS = ['youtube (no ads)', 'netflix', 'shahid', 'prime', 'disney', 'osn', 'starz', 'apple tv', 'spotify'];
+  var HIDE = /^(TizenBrew|TizenBrewNextGeneration|Home|Web Browser Service|Samsung Promotion|e-Manual|SmartThings|Samsung Health|Universal Guide|Samsung TV Plus|Bixby|Alexa|Google Assistant|Samsung Account|Settings)$/i;
+  /* Fallback list of common Samsung Tizen app IDs (used only if the TV refuses to list apps) */
+  var KNOWN = [
+    { name: 'Netflix', ids: ['3201907018807', '11101200001'] },
+    { name: 'YouTube', ids: ['111299001912'] },
+    { name: 'Prime Video', ids: ['3201910019365', '3201512006785'] },
+    { name: 'Disney+', ids: ['3201901017640'] },
+    { name: 'Apple TV', ids: ['3201807016597'] },
+    { name: 'Spotify', ids: ['3201606009684'] },
+    { name: 'Internet', ids: ['org.tizen.browser', 'com.samsung.tv.browser'] }
+  ];
   var BRAND = [
-    [/netflix/i, '#e50914', 'N'], [/youtube/i, '#ff0033', '▶'], [/shahid|mbc/i, '#14c3a2', 'S'],
-    [/prime/i, '#00a8e1', 'P'], [/disney/i, '#113ccf', 'D+'], [/apple/i, '#1c1c1e', ''],
-    [/spotify/i, '#1db954', 'S'], [/osn/i, '#0b1f4b', 'OSN'], [/starz/i, '#111111', 'S'],
-    [/الشرق|asharq/i, '#d4001a', 'NOW'], [/internet|browser/i, '#3b6fd8', 'www'], [/karaoke/i, '#ff7a1a', '♪']
+    [/netflix/i, '#e50914', 'N'], [/youtube/i, '#ff0033', '▶'], [/shahid|mbc/i, '#12b394', 'S'],
+    [/prime/i, '#00a8e1', 'P'], [/disney/i, '#113ccf', 'D+'], [/apple/i, '#2a2a2e', 'tv'],
+    [/spotify/i, '#1db954', 'S'], [/osn/i, '#14306e', 'OSN'], [/starz/i, '#1b1b1b', 'S'],
+    [/الشرق|asharq/i, '#c4001a', 'NOW'], [/internet|browser/i, '#3b6fd8', 'www'], [/karaoke/i, '#ff7a1a', '♪']
   ];
 
-  /* ---------- helpers ---------- */
+  /* ================= helpers ================= */
   function $(id) { return document.getElementById(id); }
   function load(k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
   function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
   function toast(msg) {
     var t = $('toast'); t.textContent = msg; t.className = 'show';
-    clearTimeout(toast._t); toast._t = setTimeout(function () { t.className = ''; }, 1800);
+    clearTimeout(toast._t); toast._t = setTimeout(function () { t.className = ''; }, 2000);
   }
+  var diagParts = {};
+  function diag(k, v) { diagParts[k] = v; var s = []; for (var x in diagParts) s.push(x + ':' + diagParts[x]); $('diag').textContent = s.join(' · '); }
   function brandOf(name) {
     for (var i = 0; i < BRAND.length; i++) if (BRAND[i][0].test(name)) return BRAND[i];
     var h = 0; for (var j = 0; j < name.length; j++) h = (h * 31 + name.charCodeAt(j)) % 360;
-    return [null, 'hsl(' + h + ',45%,32%)', name.charAt(0).toUpperCase()];
+    return [null, 'hsl(' + h + ',45%,34%)', name.charAt(0).toUpperCase()];
   }
-
-  /* ---------- clock ---------- */
-  var DAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-  var MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-  function tick() {
-    var d = new Date(), h = d.getHours(), m = d.getMinutes();
-    var h12 = h % 12 || 12;
-    $('time').textContent = h12 + ':' + (m < 10 ? '0' : '') + m;
-    $('date').textContent = DAYS[d.getDay()] + '، ' + d.getDate() + ' ' + MONTHS[d.getMonth()];
-    $('greet').textContent = h < 12 ? 'صباح الخير ☀️' : (h < 18 ? 'مساء النور 🌤️' : 'مساء الخير 🌙');
-  }
-
-  /* ---------- weather (Open-Meteo, no key) ---------- */
-  var WCODE = { 0: 'صافي', 1: 'صافي غالبًا', 2: 'غائم جزئيًا', 3: 'غائم', 45: 'شبورة', 48: 'شبورة', 51: 'رذاذ', 61: 'مطر خفيف', 63: 'مطر', 65: 'مطر غزير', 80: 'زخات مطر', 95: 'عاصفة رعدية' };
-  function weather() {
-    var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + CITY.lat + '&longitude=' + CITY.lon + '&current=temperature_2m,weather_code&timezone=auto';
-    var x = new XMLHttpRequest();
-    x.open('GET', url); x.timeout = 8000;
-    x.onload = function () {
-      try {
-        var c = JSON.parse(x.responseText).current;
-        $('wtemp').textContent = Math.round(c.temperature_2m) + '°';
-        $('wdesc').textContent = CITY.name + ' · ' + (WCODE[c.weather_code] || '');
-      } catch (e) {}
-    };
+  function getJSON(url, ok, fail) {
+    var x = new XMLHttpRequest(); x.open('GET', url); x.timeout = 10000;
+    x.onload = function () { try { ok(JSON.parse(x.responseText)); } catch (e) { if (fail) fail(e); } };
+    x.onerror = x.ontimeout = function () { if (fail) fail(); };
     x.send();
   }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function fmt12(h, m) { return (h % 12 || 12) + ':' + pad(m); }
 
-  /* ---------- data sources ---------- */
-  var apps = [];   // {key, name, kind:'tizen'|'module', id, icon, module}
-  var favs = load(FAV_KEY, null);
+  /* ================= wallpaper (changes daily) ================= */
+  (function () {
+    var d = new Date(), seed = 'amr' + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate());
+    var img = new Image();
+    img.onload = function () { $('wall').style.backgroundImage = 'url(' + img.src + ')'; $('wall').className = 'on'; };
+    img.src = 'https://picsum.photos/seed/' + seed + '/1920/1080';
+  })();
 
-  function hasTizen() { return typeof tizen !== 'undefined' && tizen.application; }
+  /* ================= clock ================= */
+  var DAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+  var MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+  var hijri = '';
+  function tick() {
+    var d = new Date(), h = d.getHours();
+    $('time').textContent = fmt12(h, d.getMinutes());
+    $('date').textContent = DAYS[d.getDay()] + '، ' + d.getDate() + ' ' + MONTHS[d.getMonth()] + (hijri ? '  ·  ' + hijri : '');
+    $('greet').textContent = h < 5 ? 'تصبح على خير 🌙' : h < 12 ? 'صباح الخير ☀️' : h < 18 ? 'مساء النور 🌤️' : 'مساء الخير 🌙';
+    renderPrayers();
+  }
 
-  function loadTizenApps(cb) {
-    if (!hasTizen()) return cb([]);
+  /* ================= weather ================= */
+  var WCODE = { 0: 'صافي', 1: 'صافي غالبًا', 2: 'غائم جزئيًا', 3: 'غائم', 45: 'شبورة', 48: 'شبورة', 51: 'رذاذ', 53: 'رذاذ', 61: 'مطر خفيف', 63: 'مطر', 65: 'مطر غزير', 80: 'زخات مطر', 95: 'عاصفة رعدية' };
+  function weather() {
+    getJSON('https://api.open-meteo.com/v1/forecast?latitude=' + CITY.lat + '&longitude=' + CITY.lon + '&current=temperature_2m,weather_code&timezone=auto',
+      function (j) { var c = j.current; $('wtemp').textContent = Math.round(c.temperature_2m) + '°'; $('wdesc').textContent = CITY.name + ' · ' + (WCODE[c.weather_code] || ''); });
+  }
+
+  /* ================= prayer times (Aladhan) ================= */
+  var PR = [['Fajr', 'الفجر'], ['Sunrise', 'الشروق'], ['Dhuhr', 'الظهر'], ['Asr', 'العصر'], ['Maghrib', 'المغرب'], ['Isha', 'العشاء']];
+  var times = null, timesDay = '';
+  function loadPrayers() {
+    var d = new Date(), key = d.getDate() + '-' + (d.getMonth() + 1) + '-' + d.getFullYear();
+    if (timesDay === key && times) return;
+    getJSON('https://api.aladhan.com/v1/timingsByCity/' + key + '?city=' + CITY.en + '&country=' + CITY.country + '&method=' + CITY.method,
+      function (j) {
+        times = j.data.timings; timesDay = key;
+        try { var hj = j.data.date.hijri; hijri = hj.day + ' ' + hj.month.ar + ' ' + hj.year + 'هـ'; } catch (e) {}
+        tick();
+      }, function () { diag('pray', 'err'); });
+  }
+  function renderPrayers() {
+    if (!times) return;
+    var now = new Date(), nowMin = now.getHours() * 60 + now.getMinutes(), nextIdx = -1, html = '';
+    var mins = PR.map(function (p) { var s = (times[p[0]] || '0:0').split(' ')[0].split(':'); return (+s[0]) * 60 + (+s[1]); });
+    for (var i = 0; i < PR.length; i++) if (i !== 1 && mins[i] > nowMin) { nextIdx = i; break; }
+    if (nextIdx === -1) nextIdx = 0;
+    for (var k = 0; k < PR.length; k++) {
+      var m = mins[k], left = '';
+      if (k === nextIdx) {
+        var diff = (m - nowMin + 1440) % 1440;
+        left = '<div class="left">باقي ' + Math.floor(diff / 60) + ':' + pad(diff % 60) + '</div>';
+      }
+      html += '<div class="pr' + (k === nextIdx ? ' next' : '') + '"><div class="n">' + PR[k][1] + '</div><div class="t">' + fmt12(Math.floor(m / 60), m % 60) + '</div>' + left + '</div>';
+    }
+    $('prayers').innerHTML = html;
+  }
+
+  /* ================= apps: several sources ================= */
+  var apps = [], favs = load(FAV_KEY, null), remote = null, favsSaved = !!favs; if (!favs) favs = [];
+
+  function addApp(a) { for (var i = 0; i < apps.length; i++) if (apps[i].name.toLowerCase() === a.name.toLowerCase()) return; apps.push(a); }
+
+  /* 1) TizenBrew modules (TizenTube etc.) */
+  var tbws = null;
+  function loadModules(cb) {
+    var done = false; function fin() { if (!done) { done = true; cb(); } }
+    try {
+      tbws = new WebSocket('ws://127.0.0.1:8081');
+      tbws.onopen = function () { tbws.send(JSON.stringify({ type: 4, payload: false })); };
+      tbws.onmessage = function (ev) {
+        var msg; try { msg = JSON.parse(ev.data); } catch (e) { return; }
+        if (msg.type === 4 && msg.payload) {
+          for (var i = 0; i < msg.payload.length; i++) {
+            var m = msg.payload[i];
+            if (!m || !m.appName || m.packageType === 'service' || /amr-tv-home/.test(m.fullName || '')) continue;
+            addApp({ key: 'mod:' + m.fullName, name: /tizentube/i.test(m.fullName || '') ? 'YouTube (No Ads)' : m.appName, kind: 'module', module: m });
+          }
+          diag('mods', msg.payload.length); fin();
+        }
+      };
+      tbws.onerror = fin; setTimeout(fin, 2500);
+    } catch (e) { fin(); }
+  }
+
+  /* 2) Tizen Web API */
+  function loadTizen(cb) {
+    if (typeof tizen === 'undefined' || !tizen.application) { diag('tz', 'none'); return cb(false); }
     try {
       tizen.application.getAppsInfo(function (list) {
-        var out = [];
+        var n = 0;
         for (var i = 0; i < list.length; i++) {
           var a = list[i];
           if (a.show === false || !a.name || HIDE.test(a.name)) continue;
-          var icon = a.iconPath || '';
-          if (icon && icon.charAt(0) === '/') icon = 'file://' + icon;
-          out.push({ key: 'app:' + a.id, name: a.name, kind: 'tizen', id: a.id, icon: icon });
+          var icon = a.iconPath || ''; if (icon && icon.charAt(0) === '/') icon = 'file://' + icon;
+          addApp({ key: 'app:' + a.id, name: a.name, kind: 'app', id: a.id, icon: icon }); n++;
         }
-        cb(out);
-      }, function () { cb([]); });
-    } catch (e) { cb([]); }
+        diag('tz', n); cb(n > 0);
+      }, function (e) { diag('tz', 'err ' + (e && e.name)); cb(false); });
+    } catch (e) { diag('tz', 'ex ' + (e && e.name)); cb(false); }
   }
 
-  /* TizenBrew modules (e.g. TizenTube) via the local TizenBrew service */
-  var ws = null;
-  function loadModules(cb) {
-    var done = false;
-    function finish(list) { if (!done) { done = true; cb(list); } }
-    try {
-      ws = new WebSocket('ws://127.0.0.1:8081');
-      ws.onopen = function () { ws.send(JSON.stringify({ type: 4, payload: false })); };
-      ws.onmessage = function (ev) {
-        var msg; try { msg = JSON.parse(ev.data); } catch (e) { return; }
-        if (msg.type === 4 && msg.payload) {
-          var out = [];
-          for (var i = 0; i < msg.payload.length; i++) {
-            var m = msg.payload[i];
-            if (!m || !m.appName || m.packageType === 'service') continue;
-            if (/amr-tv-home/.test(m.fullName || '')) continue;
-            var nm = /tizentube/i.test(m.fullName || '') ? 'YouTube (No Ads)' : m.appName;
-            out.push({ key: 'mod:' + m.fullName, name: nm, kind: 'module', module: m, icon: '' });
+  /* 3) Samsung TV remote-control API on the TV itself (asks once for permission on screen) */
+  function loadRemote(cb) {
+    var done = false; function fin(ok) { if (!done) { done = true; cb(ok); } }
+    var tries = ['ws://127.0.0.1:8001/api/v2/channels/samsung.remote.control?name=' + btoa('Home'),
+                 'wss://127.0.0.1:8002/api/v2/channels/samsung.remote.control?name=' + btoa('Home') + (load('amrhome.token', '') ? '&token=' + load('amrhome.token', '') : '')];
+    function attempt(i) {
+      if (i >= tries.length) { diag('rc', 'no'); return fin(false); }
+      var w; try { w = new WebSocket(tries[i]); } catch (e) { return attempt(i + 1); }
+      var opened = false;
+      var to = setTimeout(function () { if (!opened) { try { w.close(); } catch (e) {} attempt(i + 1); } }, 20000);
+      w.onmessage = function (ev) {
+        var m; try { m = JSON.parse(ev.data); } catch (e) { return; }
+        if (m.event === 'ms.channel.connect') {
+          opened = true; clearTimeout(to); remote = w;
+          if (m.data && m.data.token) save('amrhome.token', m.data.token);
+          w.send(JSON.stringify({ method: 'ms.channel.emit', params: { event: 'ed.installedApp.get', to: 'host' } }));
+        } else if (m.event === 'ed.installedApp.get') {
+          var list = (m.data && m.data.data) || [], n = 0;
+          for (var k = 0; k < list.length; k++) {
+            var a = list[k]; if (!a.name || HIDE.test(a.name)) continue;
+            addApp({ key: 'app:' + a.appId, name: a.name, kind: 'app', id: a.appId, appType: a.app_type, iconPath: a.icon }); n++;
           }
-          finish(out);
-        }
+          diag('rc', n); fin(n > 0); requestIcons();
+        } else if (m.event === 'ed.apps.icon' && m.data && m.data.imageBase64) {
+          iconArrived(m.data.iconPath, m.data.imageBase64);
+        } else if (m.event === 'ms.channel.unauthorized') { clearTimeout(to); attempt(i + 1); }
       };
-      ws.onerror = function () { finish([]); };
-      setTimeout(function () { finish([]); }, 2500);
-    } catch (e) { finish([]); }
+      w.onerror = function () { clearTimeout(to); if (!opened) attempt(i + 1); };
+    }
+    attempt(0);
+  }
+  var iconQueue = [];
+  function requestIcons() {
+    for (var i = 0; i < apps.length; i++) if (apps[i].iconPath) iconQueue.push(apps[i].iconPath);
+    (function next() {
+      if (!iconQueue.length || !remote) return;
+      remote.send(JSON.stringify({ method: 'ms.channel.emit', params: { event: 'ed.apps.icon', to: 'host', data: { iconPath: iconQueue.shift() } } }));
+      setTimeout(next, 120);
+    })();
+  }
+  function iconArrived(path, b64) {
+    for (var i = 0; i < apps.length; i++) if (apps[i].iconPath === path) { apps[i].icon = 'data:image/png;base64,' + b64; }
+    clearTimeout(iconArrived._t); iconArrived._t = setTimeout(function () { render(cur && cur.getAttribute('data-key'), cur && cur.getAttribute('data-row')); }, 400);
   }
 
-  /* ---------- launching ---------- */
+  /* 4) Known IDs (last resort) */
+  function loadKnown() {
+    for (var i = 0; i < KNOWN.length; i++) addApp({ key: 'known:' + KNOWN[i].name, name: KNOWN[i].name, kind: 'app', ids: KNOWN[i].ids });
+    diag('known', KNOWN.length);
+  }
+
+  /* ================= launching ================= */
+  function launchId(ids, i, name) {
+    if (i >= ids.length) return toast('مقدرتش أفتح ' + name);
+    var id = ids[i];
+    if (typeof tizen !== 'undefined' && tizen.application) {
+      try {
+        tizen.application.launch(id, null, function () {
+          if (remote) remoteLaunch(id); else launchId(ids, i + 1, name);
+        });
+        return;
+      } catch (e) {}
+    }
+    if (remote) remoteLaunch(id); else launchId(ids, i + 1, name);
+  }
+  function remoteLaunch(id, type) {
+    remote.send(JSON.stringify({ method: 'ms.channel.emit', params: { event: 'ed.apps.launch', to: 'host',
+      data: { appId: id, action_type: type === 2 ? 'DEEP_LINK' : 'NATIVE_LAUNCH' } } }));
+  }
   function launch(item) {
     toast('جاري فتح ' + item.name + '…');
-    if (item.kind === 'tizen') {
-      try {
-        tizen.application.launch(item.id, null, function (e) { toast('مقدرتش أفتح ' + item.name); });
-      } catch (e) { toast('مقدرتش أفتح ' + item.name); }
-    } else if (item.kind === 'module') {
+    if (item.kind === 'module') {
       var m = item.module;
       try { for (var i = 0; i < (m.keys || []).length; i++) tizen.tvinputdevice.registerKey(m.keys[i]); } catch (e) {}
-      try { ws.send(JSON.stringify({ type: 5, payload: m })); } catch (e) {}
+      try { tbws.send(JSON.stringify({ type: 5, payload: m })); } catch (e) {}
       if (!m.evaluateScriptOnDocumentStart && m.appPath) setTimeout(function () { location.href = m.appPath; }, 150);
+      return;
     }
+    if (item.appType !== undefined && remote) return remoteLaunch(item.id, item.appType);
+    launchId(item.ids || [item.id], 0, item.name);
   }
 
-  /* ---------- rendering ---------- */
+  /* ================= rendering ================= */
   function byKey(k) { for (var i = 0; i < apps.length; i++) if (apps[i].key === k) return apps[i]; return null; }
   function isFav(k) { return favs.indexOf(k) !== -1; }
-
   function makeTile(item, inFav) {
     var el = document.createElement('div');
-    el.className = 'tile';
-    el.setAttribute('data-key', item.key);
-    el.setAttribute('data-row', inFav ? 'fav' : 'all');
+    el.className = 'tile'; el.setAttribute('data-key', item.key); el.setAttribute('data-row', inFav ? 'fav' : 'all');
     var b = brandOf(item.name);
-    el.style.background = 'linear-gradient(145deg, ' + b[1] + ', rgba(0,0,0,0.35))';
-    var letter = document.createElement('div');
-    letter.className = 'letter'; letter.textContent = b[2] || item.name.charAt(0);
+    el.style.background = 'linear-gradient(145deg, ' + b[1] + ', rgba(0,0,0,0.45))';
+    var letter = document.createElement('div'); letter.className = 'letter'; letter.textContent = b[2] || item.name.charAt(0);
+    el.appendChild(letter);
     if (item.icon) {
       var img = new Image();
       img.onload = function () { if (letter.parentNode) el.replaceChild(img, letter); };
       img.src = item.icon;
     }
-    el.appendChild(letter);
-    var nm = document.createElement('div'); nm.className = 'name'; nm.textContent = item.name;
-    el.appendChild(nm);
+    var nm = document.createElement('div'); nm.className = 'name'; nm.textContent = item.name; el.appendChild(nm);
     if (!inFav && isFav(item.key)) { var s = document.createElement('div'); s.className = 'star'; s.textContent = '★'; el.appendChild(s); }
     return el;
   }
-
   function render(keepKey, keepRow) {
-    var fav = $('favTiles'), all = $('allTiles');
-    fav.innerHTML = ''; all.innerHTML = '';
+    var fav = $('favTiles'), all = $('allTiles'); fav.innerHTML = ''; all.innerHTML = '';
     var shown = 0;
     for (var i = 0; i < favs.length; i++) { var it = byKey(favs[i]); if (it) { fav.appendChild(makeTile(it, true)); shown++; } }
     if (!shown) { var e = document.createElement('div'); e.id = 'empty'; e.textContent = 'اضغط OK مطوّل على أي تطبيق تحت عشان تضيفه هنا'; fav.appendChild(e); }
     var sorted = apps.slice().sort(function (a, b) { return a.name.localeCompare(b.name); });
     for (var j = 0; j < sorted.length; j++) all.appendChild(makeTile(sorted[j], false));
     var target = null;
-    if (keepKey) target = document.querySelector('.tile[data-row="' + keepRow + '"][data-key="' + cssEsc(keepKey) + '"]') ||
-                          document.querySelector('.tile[data-key="' + cssEsc(keepKey) + '"]');
+    if (keepKey) {
+      var tiles = document.querySelectorAll('.tile');
+      for (var t = 0; t < tiles.length; t++) if (tiles[t].getAttribute('data-key') === keepKey && (!target || tiles[t].getAttribute('data-row') === keepRow)) target = tiles[t];
+    }
     focus(target || document.querySelector('.tile'));
   }
-  function cssEsc(s) { return String(s).replace(/(["\\])/g, '\\$1'); }
 
-  /* ---------- spatial navigation ---------- */
+  /* ================= navigation ================= */
   var cur = null;
   function focus(el) {
     if (!el) return;
     if (cur) cur.classList.remove('focused');
     cur = el; el.classList.add('focused');
-    // keep focused tile visible
     var rows = $('rows'), sc = $('scroller');
     var top = el.offsetTop, h = el.offsetHeight, view = rows.clientHeight;
-    var cur_t = -(parseFloat((sc.style.transform || '').replace(/[^-\d.]/g, '')) || 0);
-    var t = cur_t;
+    var t = -(parseFloat((sc.style.transform || '').replace(/[^-\d.]/g, '')) || 0);
     if (top - 60 < t) t = Math.max(0, top - 60);
-    if (top + h + 40 > t + view) t = top + h + 40 - view;
+    if (top + h + 30 > t + view) t = top + h + 30 - view;
     sc.style.transform = 'translateY(' + (-t) + 'px)';
   }
   function move(dir) {
@@ -295,8 +392,7 @@
     var best = null, bestScore = Infinity, tiles = document.querySelectorAll('.tile');
     for (var i = 0; i < tiles.length; i++) {
       var t = tiles[i]; if (t === cur) continue;
-      var r = t.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
-      var dx = x - cx, dy = y - cy, main, cross;
+      var r = t.getBoundingClientRect(), dx = r.left + r.width / 2 - cx, dy = r.top + r.height / 2 - cy, main, cross;
       if (dir === 'left') { if (dx >= -5) continue; main = -dx; cross = Math.abs(dy); }
       else if (dir === 'right') { if (dx <= 5) continue; main = dx; cross = Math.abs(dy); }
       else if (dir === 'up') { if (dy >= -5) continue; main = -dy; cross = Math.abs(dx); }
@@ -306,24 +402,14 @@
     }
     if (best) focus(best);
   }
-
-  /* ---------- favourites editing ---------- */
   function toggleFav() {
     if (!cur) return;
-    var k = cur.getAttribute('data-key'), row = cur.getAttribute('data-row'), it = byKey(k);
-    var idx = favs.indexOf(k);
-    if (idx === -1) { favs.push(k); toast('اتضاف للمفضلة ★ ' + it.name); }
-    else { favs.splice(idx, 1); toast('اتشال من المفضلة ' + it.name); }
+    var k = cur.getAttribute('data-key'), row = cur.getAttribute('data-row'), it = byKey(k), idx = favs.indexOf(k);
+    if (idx === -1) { favs.push(k); toast('اتضاف للمفضلة ★ ' + it.name); } else { favs.splice(idx, 1); toast('اتشال من المفضلة'); }
     save(FAV_KEY, favs); render(k, row);
   }
-  function shiftFav(delta) {
-    if (!cur || cur.getAttribute('data-row') !== 'fav') { toast('اقف على تطبيق في المفضلة الأول'); return; }
-    var k = cur.getAttribute('data-key'), i = favs.indexOf(k), j = i + delta;
-    if (i < 0 || j < 0 || j >= favs.length) return;
-    favs.splice(i, 1); favs.splice(j, 0, k); save(FAV_KEY, favs); render(k, 'fav');
-  }
 
-  /* ---------- keys ---------- */
+  var okTimer = null, okLong = false;
   document.addEventListener('keydown', function (e) {
     switch (e.keyCode) {
       case 37: move('left'); break;
@@ -332,22 +418,14 @@
       case 40: move('down'); break;
       case 13:
         if (e.repeat || okTimer) break;
-        okLong = false;
-        okTimer = setTimeout(function () { okLong = true; toggleFav(); }, 700);
+        okLong = false; okTimer = setTimeout(function () { okLong = true; toggleFav(); }, 700);
         break;
-      case 403: toggleFav(); break;           // Red
-      case 404: shiftFav(+1); break;          // Green  (RTL: next = to the left)
-      case 405: shiftFav(-1); break;          // Yellow
-      case 10009:                             // Back
-        try { tizen.application.getCurrentApplication().hide(); } catch (err) {}
-        break;
+      case 403: toggleFav(); break;
+      case 10009: try { tizen.application.getCurrentApplication().hide(); } catch (err) {} break;
       default: return;
     }
     e.preventDefault();
   });
-
-  /* OK: short press = open, long press (0.7s) = add/remove favourite */
-  var okTimer = null, okLong = false;
   document.addEventListener('keyup', function (e) {
     if (e.keyCode !== 13) return;
     if (okTimer) { clearTimeout(okTimer); okTimer = null; }
@@ -355,25 +433,32 @@
     okLong = false;
   });
 
-  /* ---------- boot ---------- */
+  /* ================= boot ================= */
   function defaultFavs() {
     var out = [];
-    for (var i = 0; i < DEFAULT_FAVS.length; i++) {
-      for (var j = 0; j < apps.length; j++) {
+    for (var i = 0; i < DEFAULT_FAVS.length; i++)
+      for (var j = 0; j < apps.length; j++)
         if (apps[j].name.toLowerCase().indexOf(DEFAULT_FAVS[i]) !== -1 && out.indexOf(apps[j].key) === -1) { out.push(apps[j].key); break; }
-      }
-    }
     return out.slice(0, 6);
   }
+  function finishApps() {
+    if (!favsSaved) { favs = defaultFavs(); save(FAV_KEY, favs); favsSaved = true; }
+    render();
+  }
 
-  tick(); setInterval(tick, 10000);
+  tick(); setInterval(tick, 15000);
   weather(); setInterval(weather, 30 * 60 * 1000);
+  loadPrayers(); setInterval(loadPrayers, 60 * 60 * 1000);
 
-  loadModules(function (mods) {
-    loadTizenApps(function (tz) {
-      apps = mods.concat(tz);
-      if (!favs) { favs = defaultFavs(); save(FAV_KEY, favs); }
-      render();
+  loadModules(function () {
+    render();
+    loadTizen(function (ok) {
+      if (ok) return finishApps();
+      toast('لو ظهرت رسالة على الشاشة تطلب إذن، اختار Allow');
+      loadRemote(function (ok2) {
+        if (!ok2) loadKnown();
+        finishApps();
+      });
     });
   });
 })();
