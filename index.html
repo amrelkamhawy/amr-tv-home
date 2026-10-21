@@ -43,6 +43,8 @@
   .all .tile { width:196px; height:118px; }
   .tile.hasicon { background:#fff !important; }
   .tile img { width:100%; height:100%; object-fit:cover; }
+  .tile.logo img { width:46%; height:auto; object-fit:contain; margin-bottom:14px; }
+  .tile.hasicon.logo .name { display:block; color:#222; }
   .tile .letter { font-size:56px; font-weight:600; color:#fff; margin-bottom:22px; font-family:Arial,sans-serif; }
   .all .tile .letter { font-size:42px; margin-bottom:18px; }
   .tile .name { position:absolute; bottom:9px; left:10px; right:10px; text-align:center; font-size:21px; font-weight:500;
@@ -105,6 +107,10 @@
     [/spotify/i, '#1db954', 'S'], [/osn/i, '#14306e', 'OSN'], [/starz/i, '#1b1b1b', 'S'], [/iptv/i, '#1d3fd6', 'TV'],
     [/playstation|ps /i, '#0070d1', 'PS'], [/yango/i, '#7b2ff7', 'Y'], [/internet|browser/i, '#3b6fd8', 'www']
   ];
+
+  var LOGOS = [[/youtube/i, 'youtube.com'], [/netflix/i, 'netflix.com'], [/prime/i, 'primevideo.com'], [/disney/i, 'disneyplus.com'],
+    [/apple tv/i, 'tv.apple.com'], [/spotify/i, 'spotify.com'], [/playstation/i, 'playstation.com'], [/osn/i, 'osnplus.com'], [/starz/i, 'starzplay.com']];
+  function logoFor(name) { for (var i = 0; i < LOGOS.length; i++) if (LOGOS[i][0].test(name)) return 'https://www.google.com/s2/favicons?domain=' + LOGOS[i][1] + '&sz=256'; return ''; }
 
   /* ================= helpers ================= */
   function $(id) { return document.getElementById(id); }
@@ -219,7 +225,7 @@
       var n = 0;
       for (var i = 0; i < j.apps.length; i++) {
         var a = j.apps[i];
-        if (a.show === false || !a.name || HIDE.test(a.name)) continue;
+        if (a.show === false || !a.name || HIDE.test(a.name) || !isUserApp(a)) continue;
         addApp({ key: 'app:' + a.id, name: a.name, kind: 'app', id: a.id, icon: a.icon ? SVC + '/icon?path=' + encodeURIComponent(a.icon) : '' }); n++;
       }
       svcOk = true; diag('svc', n); cb(n > 0);
@@ -227,6 +233,14 @@
       if (tries < 10) return setTimeout(function () { loadService(cb, tries + 1); }, 1000);
       diag('svc', 'off'); cb(false);
     });
+  }
+  /* keep store/side-loaded apps, drop Samsung/Tizen system packages */
+  function isUserApp(a) {
+    var id = String(a.id || '');
+    if (/^xvvl3S1bvH\./.test(id)) return false;               // TizenBrew itself
+    if (/browser/i.test(id)) return true;                      // Internet
+    if (/^\d{6,}/.test(id)) return true;                       // Samsung store apps
+    return /^[A-Za-z0-9]{10}\.[A-Za-z]/.test(id);              // other installed web apps
   }
   function loadKnown() { for (var i = 0; i < KNOWN.length; i++) addApp({ key: 'known:' + KNOWN[i].name, name: KNOWN[i].name, kind: 'app', ids: KNOWN[i].ids }); diag('known', KNOWN.length); }
 
@@ -259,11 +273,14 @@
     var b = brandOf(item.name);
     el.style.background = 'linear-gradient(145deg, ' + b[1] + ', rgba(0,0,0,0.45))';
     var letter = document.createElement('div'); letter.className = 'letter'; letter.textContent = b[2] || item.name.charAt(0); el.appendChild(letter);
-    if (item.icon) {
+    var srcs = []; if (item.icon) srcs.push(item.icon); var lg = logoFor(item.name); if (lg) srcs.push(lg);
+    (function tryNext(i) {
+      if (i >= srcs.length) return;
       var img = new Image();
-      img.onload = function () { if (letter.parentNode) { el.replaceChild(img, letter); el.className += ' hasicon'; } };
-      img.src = item.icon;
-    }
+      img.onload = function () { if (img.naturalWidth < 32) return tryNext(i + 1); if (letter.parentNode) { el.replaceChild(img, letter); el.className += ' hasicon' + (i > 0 ? ' logo' : ''); } };
+      img.onerror = function () { tryNext(i + 1); };
+      img.src = srcs[i];
+    })(0);
     var nm = document.createElement('div'); nm.className = 'name'; nm.textContent = item.name; el.appendChild(nm);
     if (!inFav && favs.indexOf(item.key) !== -1) { var s = document.createElement('div'); s.className = 'star'; s.textContent = '★'; el.appendChild(s); }
     return el;
@@ -293,7 +310,7 @@
     if (top + h + 30 > t + view) t = top + h + 30 - view;
     sc.style.transform = 'translateY(' + (-t) + 'px)';
     var it = byKey(el.getAttribute('data-key')), lb = $('label');
-    if (it && el.className.indexOf('hasicon') !== -1) {
+    if (it && el.className.indexOf("hasicon") !== -1 && el.className.indexOf("logo") === -1) {
       lb.textContent = it.name; lb.style.display = 'block';
       setTimeout(function () { lb.style.left = (el.offsetLeft + 40) + 'px'; lb.style.top = (el.offsetTop + el.offsetHeight + 30 - t) + 'px'; }, 0);
     } else lb.style.display = 'none';
